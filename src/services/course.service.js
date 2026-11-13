@@ -1,8 +1,9 @@
 const AppError = require('../utils/AppError');
-const { ROLES, COURSE_STATUS } = require('../utils/constants');
+const { ROLES, COURSE_STATUS, ENROLLMENT_STATUS } = require('../utils/constants');
 const { buildPaginationMeta } = require('../utils/pagination');
 const courseRepository = require('../repositories/course.repository');
 const categoryRepository = require('../repositories/category.repository');
+const enrollmentRepository = require('../repositories/enrollment.repository');
 
 const isAdmin = (user) => user?.role === ROLES.ADMIN;
 const isOwner = (user, course) => Boolean(user?.instructorId) && user.instructorId === course.instructor.id;
@@ -37,17 +38,32 @@ function getInstructorId(user) {
 
 // ----- Público -----
 
-function listCatalog(query) {
-  return paginate({ ...query, publicOnly: true });
+/** Catálogo público. Filtro opcional ?instructor=id para el perfil del instructor. */
+function listCatalog({ instructor, ...query }) {
+  return paginate({ ...query, instructorId: instructor, publicOnly: true });
 }
 
-/** Un curso no publicado solo lo pueden ver su instructor y el admin. */
+/**
+ * Un curso no publicado solo lo pueden ver su instructor y el admin.
+ * Excepción: si el curso se oculta del catálogo, los estudiantes ya inscritos
+ * conservan el acceso. Si fue dado de baja, solo el admin puede verlo.
+ */
 async function getById(id, user) {
   const course = await courseRepository.findById(id);
-  const isPublic = course && course.isActive && course.status === COURSE_STATUS.PUBLISHED;
-  if (isPublic) return course;
-  if (course && (isAdmin(user) || (course.isActive && isOwner(user, course)))) return course;
+  if (!course) throw AppError.notFound('Curso no encontrado');
+
+  const isPublic = course.isActive && course.status === COURSE_STATUS.PUBLISHED;
+  if (isPublic || isAdmin(user)) return course;
+  if (course.isActive && isOwner(user, course)) return course;
+  if (course.isActive && (await isEnrolledStudent(user, course.id))) return course;
+
   throw AppError.notFound('Curso no encontrado');
+}
+
+async function isEnrolledStudent(user, courseId) {
+  if (user?.role !== ROLES.USER) return false;
+  const enrollment = await enrollmentRepository.findByUserAndCourse(user.id, courseId);
+  return enrollment?.status === ENROLLMENT_STATUS.ACTIVE;
 }
 
 // ----- Instructor -----

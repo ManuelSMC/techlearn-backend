@@ -1,8 +1,16 @@
 const AppError = require('../utils/AppError');
+const { buildPaginationMeta } = require('../utils/pagination');
 const instructorRepository = require('../repositories/instructor.repository');
 
-function listPublic({ limit = 3 } = {}) {
-  return instructorRepository.listPublic({ limit });
+async function listPublic(query) {
+  const { items, total } = await instructorRepository.listPublic(query);
+  return { items, meta: buildPaginationMeta(query.page, query.limit, total) };
+}
+
+async function getPublicProfile(id) {
+  const instructor = await instructorRepository.findPublicById(id);
+  if (!instructor) throw AppError.notFound('Instructor no encontrado');
+  return instructor;
 }
 
 async function getMyProfile(user) {
@@ -16,4 +24,4 @@ async function updateMyProfile(user, data) {
   return instructorRepository.findById(user.instructorId);
 }
 
-module.exports = { listPublic, getMyProfile, updateMyProfile };
+module.exports = { listPublic, getPublicProfile, getMyProfile, updateMyProfile };

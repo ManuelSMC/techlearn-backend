@@ -29,6 +29,7 @@ async function listByUser(userId) {
   const [rows] = await pool.query(
     `SELECT e.id, e.status, e.enrolled_at AS enrolledAt,
             co.id AS courseId, co.title, co.image_url AS imageUrl, co.price, co.level,
+            co.status AS courseStatus, co.is_active AS courseIsActive,
             ca.name AS categoryName, u.name AS instructorName
      FROM enrollments e
      JOIN courses co ON co.id = e.course_id
@@ -51,6 +52,8 @@ async function listByUser(userId) {
       level: row.level,
       categoryName: row.categoryName,
       instructorName: row.instructorName,
+      status: row.courseStatus,
+      isActive: Boolean(row.courseIsActive),
     },
   }));
 }

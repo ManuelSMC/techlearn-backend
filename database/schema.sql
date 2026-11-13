@@ -55,6 +55,7 @@ CREATE TABLE categories (
   name        VARCHAR(60)       NOT NULL,
   slug        VARCHAR(60)       NOT NULL,
   description VARCHAR(255)      NULL,
+  image_url   VARCHAR(255)      NULL,
   is_active   BOOLEAN           NOT NULL DEFAULT TRUE,
   created_at  DATETIME          NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at  DATETIME          NULL ON UPDATE CURRENT_TIMESTAMP,

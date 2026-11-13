@@ -21,10 +21,10 @@ function list({ includeInactive = false } = {}) {
   return categoryRepository.list({ includeInactive });
 }
 
-async function create({ name, slug, description }) {
+async function create({ name, slug, description, imageUrl }) {
   const finalSlug = slug || slugify(name);
   if (!finalSlug) throw AppError.badRequest('No se pudo generar un slug válido a partir del nombre');
-  const id = await categoryRepository.create({ name, slug: finalSlug, description });
+  const id = await categoryRepository.create({ name, slug: finalSlug, description, imageUrl });
   return categoryRepository.findById(id);
 }
 

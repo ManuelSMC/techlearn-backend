@@ -31,6 +31,12 @@ const usersQuerySchema = z.object({
   limit: z.coerce.number().int().min(1).max(100).default(20),
 });
 
+const instructorsQuerySchema = z.object({
+  search: z.string().trim().max(100).optional(),
+  page: z.coerce.number().int().min(1).default(1),
+  limit: z.coerce.number().int().min(1).max(50).default(12),
+});
+
 const enrollSchema = z.strictObject({
   courseId: z.coerce.number().int().positive('Curso inválido'),
 });
@@ -40,5 +46,6 @@ module.exports = {
   updateInstructorProfileSchema,
   userStatusSchema,
   usersQuerySchema,
+  instructorsQuerySchema,
   enrollSchema,
 };

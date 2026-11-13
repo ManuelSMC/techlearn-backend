@@ -1,7 +1,7 @@
 const pool = require('../config/db');
 
 const BASE_SELECT = `
-  SELECT c.id, c.name, c.slug, c.description, c.is_active AS isActive,
+  SELECT c.id, c.name, c.slug, c.description, c.image_url AS imageUrl, c.is_active AS isActive,
          COUNT(co.id) AS publishedCourses
   FROM categories c
   LEFT JOIN courses co ON co.category_id = c.id AND co.status = 'published' AND co.is_active = TRUE`;
@@ -22,17 +22,16 @@ async function findById(id) {
   return mapCategory(rows[0]);
 }
 
-async function create({ name, slug, description }) {
-  const [result] = await pool.query('INSERT INTO categories (name, slug, description) VALUES (?, ?, ?)', [
-    name,
-    slug,
-    description ?? null,
-  ]);
+async function create({ name, slug, description, imageUrl }) {
+  const [result] = await pool.query(
+    'INSERT INTO categories (name, slug, description, image_url) VALUES (?, ?, ?, ?)',
+    [name, slug, description ?? null, imageUrl ?? null]
+  );
   return result.insertId;
 }
 
-async function update(id, { name, slug, description }) {
-  const updates = { name, slug, description };
+async function update(id, { name, slug, description, imageUrl }) {
+  const updates = { name, slug, description, image_url: imageUrl };
   const fields = Object.keys(updates).filter((key) => updates[key] !== undefined);
   if (fields.length === 0) return;
   const set = fields.map((key) => `${key} = ?`).join(', ');

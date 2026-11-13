@@ -1,6 +1,6 @@
 # TechLearn API
 
-API REST del proyecto **TechLearn**, un catálogo de cursos de tecnología con tres roles (administrador, instructor y usuario). Lo desarrollé para el periodo de prueba de Desarrollo de Software de **Turing-IA**.
+API REST del proyecto **TechLearn**, un catálogo de cursos de tecnología con tres roles (administrador, instructor y usuario).
 
 > Frontend: repositorio `techlearn-frontend` (React + Vite).
 
@@ -148,6 +148,7 @@ erDiagram
         varchar name UK
         varchar slug UK
         varchar description
+        varchar image_url
         boolean is_active
     }
     courses {
@@ -204,7 +205,7 @@ Base: `/api/v1`. Respuesta estándar: `{ success, message, data, meta? }`.
 ### Cursos
 | Método | Ruta | Acceso | Descripción |
 |---|---|---|---|
-| GET | `/courses` | Público | Catálogo publicado. Query: `category`, `price=free\|paid`, `level`, `search`, `page`, `limit` |
+| GET | `/courses` | Público | Catálogo publicado. Query: `category`, `price=free\|paid`, `level`, `search`, `instructor`, `page`, `limit` |
 | GET | `/courses/:id` | Público* | Detalle (*los no publicados solo los ve el dueño o el admin) |
 | GET | `/courses/mine` | Instructor | Sus cursos en cualquier estado |
 | POST | `/courses` | Instructor | Crear curso (`draft`) |
@@ -228,7 +229,8 @@ Base: `/api/v1`. Respuesta estándar: `{ success, message, data, meta? }`.
 ### Instructores, inscripciones, usuarios y estadísticas
 | Método | Ruta | Acceso | Descripción |
 |---|---|---|---|
-| GET | `/instructors` | Público | Instructores destacados |
+| GET | `/instructors` | Público | Directorio de instructores (los primeros son los destacados). Query: `search`, `page`, `limit` |
+| GET | `/instructors/:id` | Público | Perfil público: especialidad, biografía, cursos publicados y estudiantes |
 | GET / PUT | `/instructors/me` | Instructor | Ver / editar su perfil |
 | POST | `/enrollments` | User | `{ "courseId": 3 }` (cursos de pago: pago simulado) |
 | GET | `/enrollments/me` | User | Mis cursos |

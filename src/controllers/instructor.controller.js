@@ -2,7 +2,12 @@ const instructorService = require('../services/instructor.service');
 const { sendSuccess } = require('../utils/response');
 
 async function listPublic(req, res) {
-  sendSuccess(res, { data: await instructorService.listPublic({ limit: 3 }) });
+  const { items, meta } = await instructorService.listPublic(req.valid.query);
+  sendSuccess(res, { data: items, meta });
+}
+
+async function getPublicProfile(req, res) {
+  sendSuccess(res, { data: await instructorService.getPublicProfile(req.valid.params.id) });
 }
 
 async function getMyProfile(req, res) {
@@ -14,4 +19,4 @@ async function updateMyProfile(req, res) {
   sendSuccess(res, { message: 'Perfil actualizado', data });
 }
 
-module.exports = { listPublic, getMyProfile, updateMyProfile };
+module.exports = { listPublic, getPublicProfile, getMyProfile, updateMyProfile };

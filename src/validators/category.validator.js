@@ -1,4 +1,5 @@
 const { z } = require('zod');
+const { urlSchema } = require('./common.validator');
 
 const slugSchema = z
   .string()
@@ -11,6 +12,7 @@ const createCategorySchema = z.strictObject({
   name: z.string().trim().min(2, 'El nombre debe tener al menos 2 caracteres').max(60),
   slug: slugSchema.optional(),
   description: z.string().trim().max(255).optional().nullable(),
+  imageUrl: urlSchema.optional().nullable(),
 });
 
 const updateCategorySchema = createCategorySchema

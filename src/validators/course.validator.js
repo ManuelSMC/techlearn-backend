@@ -27,6 +27,7 @@ const catalogQuerySchema = z.object({
   price: z.enum(['free', 'paid']).optional(),
   level: z.enum(COURSE_LEVELS).optional(),
   search: z.string().trim().max(100).optional(),
+  instructor: z.coerce.number().int().positive().optional(),
   page: z.coerce.number().int().min(1).default(1),
   limit: z.coerce.number().int().min(1).max(50).default(6),
 });
