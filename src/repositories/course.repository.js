@@ -35,12 +35,14 @@ function mapCourse(row) {
  * Construye el WHERE dinámico con parámetros (nunca concatenando valores del usuario).
  * publicOnly: solo cursos publicados, activos, de categorías e instructores activos.
  */
-function buildFilters({ publicOnly, instructorId, category, price, level, search, status, includeInactive }) {
+function buildFilters({ publicOnly, instructorId, category, price, level, search, status, includeInactive, onlyInactive }) {
   const conditions = [];
   const params = [];
 
   if (publicOnly) {
     conditions.push("co.status = 'published'", 'co.is_active = TRUE', 'ca.is_active = TRUE', 'u.is_active = TRUE');
+  } else if (onlyInactive) {
+    conditions.push('co.is_active = FALSE');
   } else if (!includeInactive) {
     conditions.push('co.is_active = TRUE');
   }

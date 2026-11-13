@@ -38,6 +38,11 @@ const adminCoursesQuerySchema = catalogQuerySchema.extend({
     .enum(['true', 'false'])
     .transform((value) => value === 'true')
     .optional(),
+  // Solo los cursos dados de baja (para revisarlos o reactivarlos)
+  onlyInactive: z
+    .enum(['true', 'false'])
+    .transform((value) => value === 'true')
+    .optional(),
 });
 
 module.exports = {

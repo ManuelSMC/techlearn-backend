@@ -212,7 +212,7 @@ Base: `/api/v1`. Respuesta estándar: `{ success, message, data, meta? }`.
 | PUT | `/courses/:id` | Instructor dueño | Editar contenido |
 | DELETE | `/courses/:id` | Instructor dueño / Admin | Baja lógica |
 | GET | `/courses/:id/students` | Instructor dueño / Admin | Estudiantes inscritos |
-| GET | `/courses/admin` | Admin | Todos los cursos. Query: `status`, `includeInactive` |
+| GET | `/courses/admin` | Admin | Todos los cursos. Query: `status`, `includeInactive`, `onlyInactive`, `search`, `page`, `limit` |
 | PATCH | `/courses/:id/status` | Admin | `{ "status": "published" \| "hidden" \| "draft" }` |
 | PATCH | `/courses/:id/restore` | Admin | Reactivar curso dado de baja |
 
