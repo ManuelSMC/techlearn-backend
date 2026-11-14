@@ -13,6 +13,7 @@ API REST del proyecto **TechLearn**, un catálogo de cursos de tecnología con t
 | Autenticación | JWT (`jsonwebtoken`) y bcrypt (`bcryptjs`) |
 | Validación | Zod |
 | Seguridad | Helmet, CORS y express-rate-limit |
+| Imágenes | Multer (recepción del archivo) y Cloudinary (almacenamiento) |
 | Pruebas | Jest y Supertest |
 | Documentación | Colección de Postman (`docs/`) |
 
@@ -54,7 +55,17 @@ La API queda disponible en `http://localhost:3000/api/v1` y se puede verificar c
 |---|---|
 | `npm run dev` | Servidor en modo desarrollo (`node --watch`) |
 | `npm start` | Servidor en modo producción |
-| `npm test` | Ejecuta las pruebas automatizadas |
+| `npm test` | Ejecuta las pruebas automatizadas (no necesita base de datos) |
+
+### Pruebas
+
+Las pruebas (`tests/`) usan **Jest** y **Supertest**: hacen peticiones HTTP reales a la aplicación de Express, pero los repositorios se reemplazan por *mocks*, así que no tocan MySQL y se pueden correr en cualquier equipo. Cubren:
+
+- Registro e inicio de sesión: contraseñas cifradas, rol forzado a `user`, mensajes que no revelan qué correos existen y cuentas deshabilitadas.
+- Autenticación y roles: 401 sin token o con token alterado, 403 sin permiso, y tokens que dejan de funcionar al deshabilitar la cuenta.
+- Reglas de negocio: cursos que nacen en borrador, el instructor tomado del token, propiedad de los cursos, visibilidad de borradores y acceso de estudiantes inscritos.
+- Validación (400), JSON mal formado, cabeceras de seguridad y límite de intentos de login (429).
+- Subida de imágenes: permisos por rol, tamaño máximo y archivos disfrazados de imagen (Cloudinary simulado).
 
 ### Variables de entorno
 
@@ -66,6 +77,7 @@ La API queda disponible en `http://localhost:3000/api/v1` y se puede verificar c
 | `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME` | Conexión a MySQL local | `localhost`, `3306`, `root`, …, `techlearn` |
 | `DATABASE_URL` | Conexión completa en la nube (tiene prioridad sobre `DB_*`) | `mysql://user:pass@host:port/railway` |
 | `JWT_SECRET` | Secreto para firmar los tokens | cadena aleatoria larga |
+| `CLOUDINARY_URL` | Credenciales de Cloudinary para subir imágenes | `cloudinary://API_KEY:API_SECRET@CLOUD_NAME` |
 | `JWT_EXPIRES_IN` | Vigencia del token | `1h` |
 
 ## Primer administrador
@@ -239,6 +251,7 @@ Base: `/api/v1`. Respuesta estándar: `{ success, message, data, meta? }`.
 | POST | `/users/instructors` | Admin | Registrar instructor (cuenta + perfil en una transacción) |
 | PATCH | `/users/:id/status` | Admin | `{ "isActive": false }` habilitar / deshabilitar |
 | GET | `/stats` | Admin | Totales, cursos por categoría y cursos más populares |
+| POST | `/uploads/images` | Instructor, Admin | Sube una imagen (`multipart/form-data`: campo `image` y `folder` = `courses`, `categories` o `instructors`). Devuelve `{ url }` |
 
 ### Postman
 
@@ -257,8 +270,19 @@ Importa `docs/TechLearn.postman_collection.json`. Ejecuta primero la carpeta **"
 - Mismo mensaje y tiempo de respuesta ante correo inexistente o contraseña incorrecta (evita la enumeración de usuarios).
 - Errores internos sin detalles para el cliente en producción.
 
+## Imágenes
+
+Las imágenes (portadas de cursos, categorías y fotos de instructores) se suben desde el dispositivo del usuario:
+
+1. El frontend envía el archivo a `POST /uploads/images`.
+2. **Multer** lo recibe en memoria: máximo 2 MB, solo JPG, PNG o WEBP.
+3. Se revisan los primeros bytes del archivo (su firma) para confirmar que de verdad es una imagen, porque el tipo que manda el navegador se puede falsificar.
+4. Se sube a **Cloudinary**, que la reduce si es muy grande, y la API devuelve la URL pública.
+5. El formulario guarda esa URL en el curso, la categoría o el perfil.
+
+Se usa Cloudinary porque el disco de los servidores como Railway es temporal: lo que se guarda ahí se pierde en cada despliegue.
+
 ## Mejoras futuras
 
-- Subida de imágenes a Cloudinary desde el formulario (hoy se registran por URL).
 - Integración con una pasarela de pago (Stripe o Mercado Pago).
 - Refresh tokens y recuperación de contraseña.

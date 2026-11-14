@@ -101,7 +101,7 @@ CREATE TABLE enrollments (
   CONSTRAINT fk_enrollments_course FOREIGN KEY (course_id) REFERENCES courses (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
------ Información inicial necesaria -----
+-- ----- Información inicial necesaria -----
 -- Roles fijos del sistema (necesarios para registrar usuarios)
 INSERT INTO roles (name) VALUES ('admin'), ('instructor'), ('user');
 
@@ -110,5 +110,5 @@ INSERT INTO categories (name, slug, description) VALUES
 ('Frontend', 'frontend', 'Interfaces web modernas'),
 ('Backend', 'backend', 'APIs y servidores');
 
------ Asignar rol admin a usuario -----
+-- ----- Asignar rol admin a usuario -----
 UPDATE users SET role_id = (SELECT id FROM roles WHERE name = 'admin') WHERE email = 'manuelsmc2004@gmail.com';

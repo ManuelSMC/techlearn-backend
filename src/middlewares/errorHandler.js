@@ -16,6 +16,13 @@ function errorHandler(err, req, res, next) {
     return res.status(400).json({ success: false, message: 'El cuerpo de la petición no es un JSON válido' });
   }
 
+  // Archivo demasiado grande o campos inesperados al subir imágenes (multer)
+  if (err.name === 'MulterError') {
+    const message =
+      err.code === 'LIMIT_FILE_SIZE' ? 'La imagen no puede pesar más de 2 MB' : 'Solo se puede subir una imagen en el campo "image"';
+    return res.status(400).json({ success: false, message });
+  }
+
   // Violación de llave única en MySQL
   if (err.code === 'ER_DUP_ENTRY') {
     return res.status(409).json({ success: false, message: 'Ya existe un registro con esos datos' });

@@ -22,6 +22,8 @@ const env = {
     password: process.env.DB_PASSWORD || '',
     name: process.env.DB_NAME || 'techlearn',
   },
+  // Formato: cloudinary://API_KEY:API_SECRET@CLOUD_NAME
+  cloudinaryUrl: process.env.CLOUDINARY_URL || '',
   jwt: {
     secret: process.env.JWT_SECRET,
     expiresIn: process.env.JWT_EXPIRES_IN || '1h',

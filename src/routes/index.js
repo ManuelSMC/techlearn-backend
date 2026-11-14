@@ -14,6 +14,7 @@ router.use('/categories', require('./category.routes'));
 router.use('/instructors', require('./instructor.routes'));
 router.use('/enrollments', require('./enrollment.routes'));
 router.use('/users', require('./user.routes'));
+router.use('/uploads', require('./upload.routes'));
 router.get('/stats', authenticate, requireRole(ROLES.ADMIN), statsController.getDashboard);
 
 module.exports = router;
