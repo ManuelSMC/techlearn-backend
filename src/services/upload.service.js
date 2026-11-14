@@ -37,7 +37,11 @@ function uploadImage(buffer, folder) {
         transformation: [{ width: MAX_SIZE_PX, height: MAX_SIZE_PX, crop: 'limit' }],
       },
       (error, result) => {
-        if (error) return reject(new AppError(502, 'No se pudo subir la imagen. Intenta de nuevo'));
+        if (error) {
+          // El detalle queda en los logs del servidor; al usuario solo se le muestra un mensaje general.
+          console.error('Error de Cloudinary:', error.message);
+          return reject(new AppError(502, 'No se pudo subir la imagen. Intenta de nuevo'));
+        }
         return resolve(result.secure_url);
       }
     );
